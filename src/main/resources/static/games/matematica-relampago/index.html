@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Matematica Relampago</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<main class="game-root">
+  <section class="panel">
+    <p class="eyebrow">Placeholder jogavel</p>
+    <h1>Matematica Relampago</h1>
+    <p id="problem" class="problem"></p>
+    <form id="answerForm" class="answer-form">
+      <input id="answer" type="number" autocomplete="off" required>
+      <button type="submit">Responder</button>
+    </form>
+    <p id="feedback" class="feedback"></p>
+    <div class="footer">
+      <span id="progress"></span>
+      <span id="scorePreview"></span>
+    </div>
+  </section>
+</main>
+<script src="/js/game-sdk.js"></script>
+<script src="./script.js"></script>
+</body>
+</html>

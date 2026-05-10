@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Perfil - EducaGames</title>
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+<div class="app-shell">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="/">
+        <span class="brand-mark">EG</span>
+        <span>EducaGames</span>
+      </a>
+      <nav class="nav">
+        <a href="/games" data-auth="signed-in">Jogos</a>
+        <a href="/ranking" data-auth="signed-in">Ranking</a>
+        <a href="/profile" data-auth="signed-in">Perfil</a>
+        <button type="button" data-auth="signed-in" data-logout>Sair</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="section-head">
+      <div>
+        <h1>Perfil do jogador</h1>
+        <p class="muted">Dados basicos do jogador e progresso acumulado.</p>
+      </div>
+    </div>
+
+    <div class="profile-layout">
+      <section class="card">
+        <div class="card-body">
+          <img id="profilePhoto" class="profile-photo" src="/img/covers/quiz-historia.svg" alt="">
+          <h3 id="profileName">Carregando...</h3>
+          <p id="profileUser" class="muted"></p>
+          <div class="meta-row">
+            <span class="pill" id="totalScore">0 pontos</span>
+            <span class="pill" id="level">Nivel 1</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-body">
+          <h3>Editar perfil</h3>
+          <form id="profileForm" class="form">
+            <div class="field">
+              <label for="name">Nome</label>
+              <input id="name" name="name" required>
+            </div>
+            <div class="field">
+              <label for="username">Username</label>
+              <input id="username" name="username" required>
+            </div>
+            <div class="field">
+              <label for="email">E-mail</label>
+              <input id="email" name="email" type="email" required>
+            </div>
+            <div class="field">
+              <label for="photoUrl">Foto opcional</label>
+              <input id="photoUrl" name="photoUrl" type="url" placeholder="https://...">
+            </div>
+            <button class="button" type="submit">Salvar</button>
+            <p id="message" class="message"></p>
+          </form>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+<script src="/js/api.js"></script>
+<script>
+  async function loadProfile() {
+    const user = await EducaAPI.requireAuth();
+    if (!user) return;
+
+    document.getElementById("profileName").textContent = user.name;
+    document.getElementById("profileUser").textContent = "@" + user.username + " - " + user.email;
+    document.getElementById("profilePhoto").src = user.photoUrl || "/img/covers/quiz-historia.svg";
+    document.getElementById("totalScore").textContent = user.totalScore + " pontos";
+    document.getElementById("level").textContent = "Nivel " + user.level;
+
+    document.getElementById("name").value = user.name;
+    document.getElementById("username").value = user.username;
+    document.getElementById("email").value = user.email;
+    document.getElementById("photoUrl").value = user.photoUrl || "";
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    loadProfile();
+
+    document.getElementById("profileForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const form = new FormData(event.currentTarget);
+      const message = document.getElementById("message");
+      message.className = "message";
+      message.textContent = "Salvando...";
+
+      try {
+        await EducaAPI.request("/users/me", {
+          method: "PUT",
+          body: JSON.stringify({
+            name: form.get("name"),
+            username: form.get("username"),
+            email: form.get("email"),
+            photoUrl: form.get("photoUrl") || null
+          })
+        });
+        message.className = "message success";
+        message.textContent = "Perfil atualizado.";
+        await loadProfile();
+      } catch (error) {
+        message.className = "message error";
+        message.textContent = error.message;
+      }
+    });
+  });
+</script>
+</body>
+</html>

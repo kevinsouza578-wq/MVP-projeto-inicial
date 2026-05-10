@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jogo - EducaGames</title>
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+<div class="app-shell">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="/">
+        <span class="brand-mark">EG</span>
+        <span>EducaGames</span>
+      </a>
+      <nav class="nav">
+        <a href="/games" data-auth="signed-in">Jogos</a>
+        <a href="/ranking" data-auth="signed-in">Ranking</a>
+        <a href="/profile" data-auth="signed-in">Perfil</a>
+        <button type="button" data-auth="signed-in" data-logout>Sair</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="section-head">
+      <div>
+        <h1 id="gameTitle">Carregando jogo...</h1>
+        <p id="gameDescription" class="muted"></p>
+      </div>
+      <a class="button secondary" href="/games">Voltar</a>
+    </div>
+    <p id="scoreStatus" class="message"></p>
+    <iframe id="gameFrame" class="game-frame" title="Jogo carregado"></iframe>
+  </main>
+</div>
+<script src="/js/api.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", async () => {
+    const user = await EducaAPI.requireAuth();
+    if (!user) return;
+
+    const slug = window.location.pathname.split("/").filter(Boolean).pop();
+    const title = document.getElementById("gameTitle");
+    const description = document.getElementById("gameDescription");
+    const frame = document.getElementById("gameFrame");
+    const status = document.getElementById("scoreStatus");
+
+    try {
+      const game = await EducaAPI.request("/games/" + slug);
+      title.textContent = game.title;
+      description.textContent = game.description + " Pontuacao maxima: " + game.maxScore + ".";
+      frame.src = game.pathUrl;
+    } catch (error) {
+      title.textContent = "Jogo nao encontrado";
+      description.textContent = error.message;
+      frame.classList.add("hidden");
+    }
+
+    window.addEventListener("message", (event) => {
+      if (event.origin !== window.location.origin) return;
+      if (!event.data || event.data.type !== "GAME_SCORE_SUBMITTED") return;
+
+      const result = event.data.payload;
+      status.className = "message success";
+      status.textContent = "Pontuacao enviada: " + result.score + ". Total: " + result.totalScore + ". Nivel: " + result.level + ".";
+    });
+  });
+</script>
+</body>
+</html>

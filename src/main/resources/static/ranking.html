@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ranking - EducaGames</title>
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+<div class="app-shell">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="/">
+        <span class="brand-mark">EG</span>
+        <span>EducaGames</span>
+      </a>
+      <nav class="nav">
+        <a href="/games" data-auth="signed-in">Jogos</a>
+        <a href="/ranking" data-auth="signed-in">Ranking</a>
+        <a href="/profile" data-auth="signed-in">Perfil</a>
+        <button type="button" data-auth="signed-in" data-logout>Sair</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="section-head">
+      <div>
+        <h1>Ranking geral</h1>
+        <p class="muted">Ordenado pela pontuacao total acumulada.</p>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+        <tr>
+          <th>Posicao</th>
+          <th>Username</th>
+          <th>Pontos</th>
+          <th>Nivel</th>
+        </tr>
+        </thead>
+        <tbody id="rankingBody">
+        <tr><td colspan="4">Carregando...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+<script src="/js/api.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", async () => {
+    const user = await EducaAPI.requireAuth();
+    if (!user) return;
+
+    const body = document.getElementById("rankingBody");
+    try {
+      const ranking = await EducaAPI.request("/ranking");
+      if (!ranking.length) {
+        body.innerHTML = "<tr><td colspan='4'>Nenhum jogador no ranking.</td></tr>";
+        return;
+      }
+
+      body.innerHTML = ranking.map((entry) => `
+        <tr>
+          <td>${entry.position}</td>
+          <td>${entry.username}</td>
+          <td>${entry.totalScore}</td>
+          <td>${entry.level}</td>
+        </tr>
+      `).join("");
+    } catch (error) {
+      body.innerHTML = "<tr><td colspan='4'>" + error.message + "</td></tr>";
+    }
+  });
+</script>
+</body>
+</html>

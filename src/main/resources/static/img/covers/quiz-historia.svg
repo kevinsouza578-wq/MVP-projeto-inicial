@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" role="img" aria-label="Capa do jogo Quiz Historia">
+  <rect width="960" height="540" fill="#10284f"/>
+  <rect x="72" y="72" width="816" height="396" rx="24" fill="#f8fafc"/>
+  <path d="M146 142h284v256H146z" fill="#d9a441"/>
+  <path d="M184 182h208M184 230h160M184 278h194M184 326h126" stroke="#10284f" stroke-width="18" stroke-linecap="round"/>
+  <circle cx="660" cy="252" r="108" fill="#2457c5"/>
+  <path d="M632 292c0-28 14-44 38-60 19-13 30-23 30-44 0-29-22-49-57-49-32 0-55 16-70 41l-42-24c24-41 62-63 114-63 60 0 103 34 103 91 0 42-22 65-55 86-19 12-25 22-25 42v16h-36v-36zm-7 74c0-17 13-30 30-30s31 13 31 30-14 31-31 31-30-14-30-31z" fill="#fff"/>
+  <text x="146" y="456" font-family="Arial, Helvetica, sans-serif" font-size="42" font-weight="800" fill="#10284f">Quiz Historia</text>
+</svg>

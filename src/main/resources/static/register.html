@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Criar conta - EducaGames</title>
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+<div class="app-shell">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="/">
+        <span class="brand-mark">EG</span>
+        <span>EducaGames</span>
+      </a>
+      <nav class="nav">
+        <a href="/login">Entrar</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="form-page">
+    <section class="form-card">
+      <h1>Criar conta</h1>
+      <p class="muted">Cadastre um jogador para testar o MVP.</p>
+      <form id="registerForm" class="form">
+        <div class="field">
+          <label for="name">Nome</label>
+          <input id="name" name="name" autocomplete="name" required minlength="2">
+        </div>
+        <div class="field">
+          <label for="username">Username</label>
+          <input id="username" name="username" autocomplete="username" required minlength="3">
+        </div>
+        <div class="field">
+          <label for="email">E-mail</label>
+          <input id="email" name="email" type="email" autocomplete="email" required>
+        </div>
+        <div class="field">
+          <label for="password">Senha</label>
+          <input id="password" name="password" type="password" autocomplete="new-password" required minlength="6">
+        </div>
+        <div class="field">
+          <label for="photoUrl">Foto opcional</label>
+          <input id="photoUrl" name="photoUrl" type="url" placeholder="https://...">
+        </div>
+        <button class="button full" type="submit">Criar conta</button>
+        <p id="message" class="message"></p>
+      </form>
+    </section>
+  </main>
+</div>
+<script src="/js/api.js"></script>
+<script>
+  document.getElementById("registerForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    const message = document.getElementById("message");
+    message.className = "message";
+    message.textContent = "Criando conta...";
+
+    try {
+      await EducaAPI.register({
+        name: form.get("name"),
+        username: form.get("username"),
+        email: form.get("email"),
+        password: form.get("password"),
+        photoUrl: form.get("photoUrl") || null
+      });
+      window.location.href = "/games";
+    } catch (error) {
+      message.className = "message error";
+      message.textContent = error.message;
+    }
+  });
+</script>
+</body>
+</html>

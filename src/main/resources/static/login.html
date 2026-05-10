@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Entrar - EducaGames</title>
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+<div class="app-shell">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="/">
+        <span class="brand-mark">EG</span>
+        <span>EducaGames</span>
+      </a>
+      <nav class="nav">
+        <a href="/register">Criar conta</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="form-page">
+    <section class="form-card">
+      <h1>Entrar</h1>
+      <p class="muted">Use sua conta para acessar jogos, perfil e ranking.</p>
+      <form id="loginForm" class="form">
+        <div class="field">
+          <label for="usernameOrEmail">Username ou e-mail</label>
+          <input id="usernameOrEmail" name="usernameOrEmail" autocomplete="username" required>
+        </div>
+        <div class="field">
+          <label for="password">Senha</label>
+          <input id="password" name="password" type="password" autocomplete="current-password" required>
+        </div>
+        <button class="button full" type="submit">Entrar</button>
+        <p id="message" class="message"></p>
+      </form>
+      <p class="muted">Conta demo: <strong>demo</strong> / <strong>123456</strong></p>
+    </section>
+  </main>
+</div>
+<script src="/js/api.js"></script>
+<script>
+  document.getElementById("loginForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    const message = document.getElementById("message");
+    message.className = "message";
+    message.textContent = "Entrando...";
+
+    try {
+      await EducaAPI.login(form.get("usernameOrEmail"), form.get("password"));
+      const redirect = new URLSearchParams(window.location.search).get("redirect") || "/games";
+      window.location.href = redirect;
+    } catch (error) {
+      message.className = "message error";
+      message.textContent = error.message;
+    }
+  });
+</script>
+</body>
+</html>

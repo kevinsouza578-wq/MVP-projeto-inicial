@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EducaGames MVP</title>
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+<div class="app-shell">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="/">
+        <span class="brand-mark">EG</span>
+        <span>EducaGames</span>
+      </a>
+      <nav class="nav">
+        <a href="/games" data-auth="signed-in">Jogos</a>
+        <a href="/ranking" data-auth="signed-in">Ranking</a>
+        <a href="/profile" data-auth="signed-in">Perfil</a>
+        <button type="button" data-auth="signed-in" data-logout>Sair</button>
+        <a href="/login" data-auth="signed-out">Entrar</a>
+        <a class="button" href="/register" data-auth="signed-out">Criar conta</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero-band">
+      <div class="hero-content">
+        <div>
+          <h1>EducaGames</h1>
+          <p>Base inicial para um portal de jogos educacionais com autenticacao, catalogo, pontuacao, niveis e ranking.</p>
+          <div class="nav">
+            <a class="button" href="/games" data-auth="signed-in">Abrir catalogo</a>
+            <a class="button secondary" href="/ranking" data-auth="signed-in">Ver ranking</a>
+            <a class="button" href="/register" data-auth="signed-out">Comecar agora</a>
+            <a class="button secondary" href="/login" data-auth="signed-out">Ja tenho conta</a>
+          </div>
+        </div>
+        <div class="hero-panel">
+          <div class="hero-stat">
+            <span>Autenticacao</span>
+            <strong>JWT + BCrypt</strong>
+          </div>
+          <div class="hero-stat">
+            <span>Persistencia</span>
+            <strong>JPA + H2</strong>
+          </div>
+          <div class="hero-stat">
+            <span>Jogos</span>
+            <strong>Pastas estaticas</strong>
+          </div>
+          <div class="hero-stat">
+            <span>Integracao</span>
+            <strong>GameSDK.submitScore</strong>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="container">
+      <div class="section-head">
+        <div>
+          <h2>Status do jogador</h2>
+          <p id="homeStatus" class="muted">Entre para carregar seu progresso.</p>
+        </div>
+      </div>
+      <div id="homeCards" class="grid"></div>
+    </section>
+  </main>
+</div>
+<script src="/js/api.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", async () => {
+    const cards = document.getElementById("homeCards");
+    const status = document.getElementById("homeStatus");
+
+    if (!EducaAPI.getToken()) {
+      cards.innerHTML = [
+        "<article class='card'><div class='card-body'><h3>Conta demo</h3><p class='muted'>Use demo@educagames.local ou demo com a senha 123456 para testar rapidamente.</p></div></article>",
+        "<article class='card'><div class='card-body'><h3>Base extensivel</h3><p class='muted'>Cada jogo pode viver em sua propria pasta e enviar pontos pelo SDK JavaScript.</p></div></article>"
+      ].join("");
+      return;
+    }
+
+    try {
+      const user = await EducaAPI.request("/users/me");
+      status.textContent = "Progresso carregado para " + user.username + ".";
+      cards.innerHTML = [
+        "<article class='card'><div class='card-body'><h3>Pontos totais</h3><div class='score-number'>" + user.totalScore + "</div></div></article>",
+        "<article class='card'><div class='card-body'><h3>Nivel atual</h3><div class='score-number'>" + user.level + "</div></div></article>",
+        "<article class='card'><div class='card-body'><h3>Proximo passo</h3><p class='muted'>Abra o catalogo e teste um jogo placeholder.</p><a class='button' href='/games'>Ver jogos</a></div></article>"
+      ].join("");
+    } catch (error) {
+      status.textContent = "Sua sessao expirou. Entre novamente.";
+      cards.innerHTML = "<div class='empty-state'>Nao foi possivel carregar o progresso.</div>";
+    }
+  });
+</script>
+</body>
+</html>

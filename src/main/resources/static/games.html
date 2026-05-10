@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jogos - EducaGames</title>
+  <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+<div class="app-shell">
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="/">
+        <span class="brand-mark">EG</span>
+        <span>EducaGames</span>
+      </a>
+      <nav class="nav">
+        <a href="/games" data-auth="signed-in">Jogos</a>
+        <a href="/ranking" data-auth="signed-in">Ranking</a>
+        <a href="/profile" data-auth="signed-in">Perfil</a>
+        <button type="button" data-auth="signed-in" data-logout>Sair</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="section-head">
+      <div>
+        <h1>Catalogo de jogos</h1>
+        <p class="muted">Jogos ativos cadastrados no backend e prontos para pontuar pelo SDK.</p>
+      </div>
+    </div>
+    <div id="gamesGrid" class="grid"></div>
+  </main>
+</div>
+<script src="/js/api.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", async () => {
+    const user = await EducaAPI.requireAuth();
+    if (!user) return;
+
+    const grid = document.getElementById("gamesGrid");
+    grid.innerHTML = "<div class='empty-state'>Carregando jogos...</div>";
+
+    try {
+      const games = await EducaAPI.request("/games");
+      if (!games.length) {
+        grid.innerHTML = "<div class='empty-state'>Nenhum jogo ativo encontrado.</div>";
+        return;
+      }
+
+      grid.innerHTML = games.map((game) => `
+        <article class="card">
+          <img class="game-cover" src="${game.coverImageUrl || "/img/covers/quiz-historia.svg"}" alt="">
+          <div class="card-body">
+            <h3>${game.title}</h3>
+            <p class="muted">${game.description}</p>
+            <div class="meta-row">
+              <span class="pill">${game.category}</span>
+              <span class="pill">${game.difficulty}</span>
+              <span class="pill">Max ${game.maxScore}</span>
+            </div>
+            <a class="button" href="/games/${game.slug}">Jogar</a>
+          </div>
+        </article>
+      `).join("");
+    } catch (error) {
+      grid.innerHTML = "<div class='empty-state'>" + error.message + "</div>";
+    }
+  });
+</script>
+</body>
+</html>
